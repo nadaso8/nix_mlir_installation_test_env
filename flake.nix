@@ -7,12 +7,11 @@
       url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs"; # avoids duplicating nixpkgs
     };
-    flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs = { self, nixpkgs, fenix, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
       let
+        system = "x86_64-linux";
         pkgs = nixpkgs.legacyPackages.${system};
         rustToolchain = fenix.packages.${system}.fromToolchainFile {
           file = ./rust-toolchain.toml;
@@ -27,7 +26,7 @@
 
       in
       {
-	devShells.default = pkgs.mkShell {
+	devShells.${system}.default = pkgs.mkShell {
 
           buildInputs = (with pkgs; [
             xorg.libxcb
@@ -42,7 +41,6 @@
           ];        
         };
 
-        formatter = pkgs.nixpkgs-fmt;
-      }
-    );
+        formatter.${system} = pkgs.nixpkgs-fmt;
+      };
 }
