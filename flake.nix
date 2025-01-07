@@ -27,9 +27,6 @@
 
       in
       {
-        packages.hello = pkgs.hello;
-        packages.default = self.packages.hello;
-
 	devShells.default = pkgs.mkShell {
 
           buildInputs = (with pkgs; [
