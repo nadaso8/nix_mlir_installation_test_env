@@ -10,37 +10,37 @@
   };
 
   outputs = { self, nixpkgs, fenix, flake-utils }:
-      let
-        system = "x86_64-linux";
-        pkgs = nixpkgs.legacyPackages.${system};
-        rustToolchain = fenix.packages.${system}.fromToolchainFile {
-          file = ./rust-toolchain.toml;
-          sha256 = "sha256-s1RPtyvDGJaX/BisLT+ifVfuhDT1nZkZ1NcK8sbwELM=";
-        };
-        
-	rustPlatform = pkgs.makeRustPlatform {
-          # inherit (rustToolchain) cargo rustc;
-          cargo = rustToolchain.cargo;
-          rustc = rustToolchain.rustc;
-        };
-
-      in
-      {
-	devShells.${system}.default = pkgs.mkShell {
-
-          buildInputs = (with pkgs; [
-            xorg.libxcb
-            libxml2
-	    llvmPackages_19.mlir
-          ]);
-	
-	  nativeBuildInputs = [
-            rustToolchain
-            rustPlatform.bindgenHook
-	    pkgs.llvmPackages_19.libllvm
-          ];        
-        };
-
-        formatter.${system} = pkgs.nixpkgs-fmt;
+    let
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
+      rustToolchain = fenix.packages.${system}.fromToolchainFile {
+        file = ./rust-toolchain.toml;
+        sha256 = "sha256-s1RPtyvDGJaX/BisLT+ifVfuhDT1nZkZ1NcK8sbwELM=";
       };
+
+      rustPlatform = pkgs.makeRustPlatform {
+        # inherit (rustToolchain) cargo rustc;
+        cargo = rustToolchain.cargo;
+        rustc = rustToolchain.rustc;
+      };
+
+    in
+    {
+      devShells.${system}.default = pkgs.mkShell {
+
+        buildInputs = (with pkgs; [
+          xorg.libxcb
+          libxml2
+          llvmPackages_19.mlir
+        ]);
+
+        nativeBuildInputs = [
+          rustToolchain
+          rustPlatform.bindgenHook
+          pkgs.llvmPackages_19.libllvm
+        ];
+      };
+
+      formatter.${system} = pkgs.nixpkgs-fmt;
+    };
 }
