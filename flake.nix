@@ -3,25 +3,22 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
-    fenix = {
-      url = "github:nix-community/fenix";
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs"; # avoids duplicating nixpkgs
     };
   };
 
-  outputs = { self, nixpkgs, fenix, flake-utils }:
+  outputs = { self, nixpkgs, rust-overlay, flake-utils }:
     let
       system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
-      rustToolchain = fenix.packages.${system}.fromToolchainFile {
-        file = ./rust-toolchain.toml;
-        sha256 = "sha256-s1RPtyvDGJaX/BisLT+ifVfuhDT1nZkZ1NcK8sbwELM=";
-      };
+      pkgs = import nixpkgs { overlays = [ rust-overlay.overlays.default ]; inherit system; };
+      rustToolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
 
       rustPlatform = pkgs.makeRustPlatform {
         # inherit (rustToolchain) cargo rustc;
-        cargo = rustToolchain.cargo;
-        rustc = rustToolchain.rustc;
+        cargo = rustToolchain;
+        rustc = rustToolchain;
       };
 
     in
